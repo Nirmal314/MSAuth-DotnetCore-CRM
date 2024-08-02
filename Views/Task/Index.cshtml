@@ -1,0 +1,58 @@
+﻿@model IEnumerable<MSAuth.Models.CrmTask>
+
+<button class="btn btn-outline-primary" onclick="exportPdf()">Export to PDF</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Task Name
+            </th>
+            <th>
+                Description
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.hiring_Taskname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.hiring_Description)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        const exportPdf = () => {
+            $.ajax({
+                type: 'GET',
+                url: '/Task/ExportTasksToPdf',
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function (data, status, xhr) {
+                    var blob = new Blob([data], { type: 'application/pdf' });
+                    var url = window.URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'Tasks.pdf';
+                    document.body.append(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                },
+                error: function (xhr, status, error) {
+                    console.error({ xhr, status, error })
+                }
+            });
+        }
+    </script>
+
+}

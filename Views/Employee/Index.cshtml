@@ -1,0 +1,61 @@
+﻿@model List<MSAuth.Models.Contact>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Employment Status</th>
+            <th>Hire Date</th>
+            <th>Download Employee Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.FullName</td>
+                <td>@item.EMailAddress1</td>
+                <td>@item.hiring_Department</td>
+                <td>@item.hiring_EmploymentStatus</td>
+                <td>@item.hiring_HireDate</td>
+                <td>
+                    <button class="btn btn-primary" onclick="viewEmployee('@item.Id')">Download</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        const viewEmployee = (employeeId) => {
+            $.ajax({
+                type: 'GET',
+                url: '/Employee/ExportWord',
+                data: { employeeId },
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function (data, status, xhr) {
+                    var filename = xhr.getResponseHeader('Content-Disposition').split('filename=')[1].split(';')[0];
+                    var blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                },
+                error: function (xhr, status, error) {
+                    console.error({ xhr, status, error })
+                }
+            });
+        }
+
+        const exportPdf = () => {
+
+        }
+    </script>
+}
