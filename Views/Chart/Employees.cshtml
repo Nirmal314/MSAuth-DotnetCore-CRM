@@ -1,0 +1,56 @@
+﻿@model MSAuth.Models.EmployeePieChart
+
+<div class="container mt-5">
+    <div class="row">
+        <!-- Departments Pie Chart -->
+        <div class="col-lg-6 col-md-12">
+            <div class="text-center">
+                <h2>Departments</h2>
+                <canvas id="departmentsPieChart" width="200" height="200"></canvas>
+            </div>
+        </div>
+        <!-- Employment Status Pie Chart -->
+        <div class="col-lg-6 col-md-12">
+            <div class="text-center">
+                <h2>Employment Status</h2>
+                <canvas id="employmentStatusPieChart" width="200" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var departmentsCtx = document.getElementById('departmentsPieChart').getContext('2d');
+        var departmentsPieChart = new Chart(departmentsCtx, {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.Departments)),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.DepartmentsData)),
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                    hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        var employmentStatusCtx = document.getElementById('employmentStatusPieChart').getContext('2d');
+        var employmentStatusPieChart = new Chart(employmentStatusCtx, {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.EmployementStatus)),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.EmployementStatusData)),
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                    hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    </script>
+}

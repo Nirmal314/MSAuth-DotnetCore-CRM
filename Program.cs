@@ -45,7 +45,6 @@ var connectionString = builder.Configuration.GetConnectionString("MSAuthContextC
 builder.Services.AddDbContext<MSAuthContext>(options => options.UseSqlServer(connectionString));
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<MSAuthContext>();
-builder.Services.AddControllersWithViews();
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddDistributedMemoryCache();
@@ -67,6 +66,7 @@ builder.Services.AddMvc(options =>
 builder.Services.AddScoped<SessionService>();
 builder.Services.AddScoped<ICrmService, CrmService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IChartService, ChartService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -77,6 +77,8 @@ builder.Services.AddTransient<ServiceClient>(provider =>
     string connection = $"AuthType=ClientSecret;Url={url};ClientId={clientId};ClientSecret={clientSecret}";
     return new ServiceClient(connection);
 });
+
+builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
