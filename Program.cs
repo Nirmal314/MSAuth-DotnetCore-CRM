@@ -35,7 +35,7 @@ foreach (var line in File.ReadAllLines(dotenv))
     Environment.SetEnvironmentVariable(parts[0], parts[1]);
 }
 
-string clientId = Environment.GetEnvironmentVariable("ClientID")!;
+string clientId = Environment.GetEnvironmentVariable("﻿ClientID")!;
 string clientSecret = Environment.GetEnvironmentVariable("ClientSecret")!;
 string url = Environment.GetEnvironmentVariable("CRMUrl")!;
 
@@ -77,7 +77,6 @@ builder.Services.AddTransient<ServiceClient>(provider =>
     string connection = $"AuthType=ClientSecret;Url={url};ClientId={clientId};ClientSecret={clientSecret}";
     return new ServiceClient(connection);
 });
-
 
 var app = builder.Build();
 

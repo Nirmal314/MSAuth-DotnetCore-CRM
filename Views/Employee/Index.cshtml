@@ -1,9 +1,29 @@
 ﻿@model List<MSAuth.Models.Contact>
 
+<div class="d-flex flex-column align-items-end justify-content-center">
+    <div class="input-group mb-3">
+        <input id="searchedEmployee" type="text" class="form-control" placeholder="Search employee...">
+        <button class="btn btn-outline-primary" type="button" onclick="search()">Search</button>
+    </div>
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="sort-btn" data-bs-toggle="dropdown" aria-expanded="false">
+            Sort by
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="sort-btn">
+            <li><a class="dropdown-item" href="/Employee/Index?sort=eaz">Employee name (A to Z)</a></li>
+            <li><a class="dropdown-item" href="/Employee/Index?sort=eza">Employee name (Z to A)</a></li>
+            <li><a class="dropdown-item" href="/Employee/Index?sort=hno">Hire date (newer to older)</a></li>
+            <li><a class="dropdown-item" href="/Employee/Index?sort=hon">Hire date (older to newer)</a></li>
+        </ul>
+    </div>
+</div>
+
 <table class="table">
     <thead>
         <tr>
-            <th>Full Name</th>
+            <th>
+                Full Name
+            </th>
             <th>Email</th>
             <th>Department</th>
             <th>Employment Status</th>
@@ -11,7 +31,7 @@
             <th>Download Employee Details</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="employeeTableBody">
         @foreach (var item in Model)
         {
             <tr>
@@ -54,8 +74,93 @@
             });
         }
 
-        const exportPdf = () => {
+        const search = () => {
+            var employeeName = document.getElementById('searchedEmployee').value;
 
+            $.ajax({
+                type: 'GET',
+                url: '/Employee/SearchEmployees',
+                data: { employeeName },
+                success: function (response) {
+                    if (!response.success) alert(response.message)
+                    var rows = '';
+
+                    if (response.contacts.length > 0) {
+                        response.contacts.forEach(function (contact) {
+                            console.log(contact)
+                            rows += `
+                                                                        <tr>
+                                                                            <td>${contact.fullName}</td>
+                                                                            <td>${contact.eMailAddress1 ?? ""}</td>
+                                                                            <td>${getDepartment(contact.hiring_Department)}</td>
+                                                                            <td>${getEmployementStatus(contact.hiring_EmploymentStatus)}</td>
+                                                                            <td>${formatISODate(contact.hiring_HireDate)}</td>
+                                                                            <td>
+                                                                                <button class="btn btn-primary" onclick="viewEmployee('${contact.contactId}')">Download</button>
+                                                                            </td>
+                                                                        </tr>`;
+                        });
+
+
+                        $('#employeeTableBody').html(rows);
+                    }
+
+                },
+                error: function (xhr, status, error) {
+                    console.error({ xhr, status, error });
+                }
+            });
         }
+
+        const formatISODate = (isoDateString) => {
+            const date = new Date(isoDateString);
+
+            const month = date.getUTCMonth() + 1;
+            const day = date.getUTCDate();
+            const year = date.getUTCFullYear();
+            let hours = date.getUTCHours();
+            const minutes = date.getUTCMinutes();
+            const seconds = date.getUTCSeconds();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+
+            const formattedMinutes = minutes.toString().padStart(2, '0');
+            const formattedSeconds = seconds.toString().padStart(2, '0');
+
+            const formattedDate = `${month}/${day}/${year} ${hours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
+
+            return formattedDate;
+        }
+
+        const getDepartment = (department) => {
+            switch (department) {
+                case 414090000:
+                    return 'HR';
+                case 414090001:
+                    return 'Sales';
+                case 414090002:
+                    return 'IT';
+                case 414090003:
+                    return 'Marketing';
+                default:
+                    return '';
+            }
+        }
+
+        const getEmployementStatus = (employementStatus) => {
+            switch (employementStatus) {
+                case 414090000:
+                    return 'Probation';
+                case 414090001:
+                    return 'Employee';
+                case 414090002:
+                    return 'Ex-Employee';
+                default:
+                    return '';
+            }
+        }
+
     </script>
 }

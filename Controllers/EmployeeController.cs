@@ -23,9 +23,36 @@ public class EmployeeController : Controller
 
     public IActionResult Index()
     {
-        List<Contact> contacts = _employeeService.GetAllEmployees();
+        string? sort = HttpContext.Request.Query["sort"];
+        List<Contact> contacts = [];
 
+        contacts = sort switch
+        {
+            "eaz" => _employeeService.GetSortedEmployees("eaz"),
+            "eza" => _employeeService.GetSortedEmployees("eza"),
+            "hno" => _employeeService.GetSortedEmployees("hno"),
+            "hon" => _employeeService.GetSortedEmployees("hon"),
+            _ => _employeeService.GetAllEmployees(),
+        };
         return View(contacts);
+    }
+
+    public IActionResult SearchEmployees(string employeeName)
+    {
+        if (string.IsNullOrEmpty(employeeName))
+        {
+            List<Contact> allContacts = _employeeService.GetAllEmployees();
+            return Json(new { contacts = allContacts, sucess = false, message = "Searched employee is empty." });
+        }
+
+        List<Contact> contacts = _employeeService.SearchEmployees(employeeName);
+
+        if (contacts.Count <= 0)
+        {
+            return Json(new { sucess = false, message = "No employees found for " + employeeName });
+        }
+
+        return Json(new { contacts, success = true });
     }
 
     public IActionResult ExportWord(string employeeId)

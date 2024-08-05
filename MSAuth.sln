@@ -5,8 +5,6 @@ VisualStudioVersion = 17.8.34408.163
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MSAuth", "MSAuth.csproj", "{239A5AA6-8683-4F23-B552-540540E0C4ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "..\WebApplication1\WebApplication1.csproj", "{8ED0DBF9-2B00-4E52-9E21-6EF2215E9811}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{239A5AA6-8683-4F23-B552-540540E0C4ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{239A5AA6-8683-4F23-B552-540540E0C4ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{239A5AA6-8683-4F23-B552-540540E0C4ED}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8ED0DBF9-2B00-4E52-9E21-6EF2215E9811}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8ED0DBF9-2B00-4E52-9E21-6EF2215E9811}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8ED0DBF9-2B00-4E52-9E21-6EF2215E9811}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8ED0DBF9-2B00-4E52-9E21-6EF2215E9811}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
