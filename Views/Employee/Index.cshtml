@@ -2,53 +2,60 @@
 @{
     ViewBag.Title = "Employees";
 }
-<div class="d-flex flex-column align-items-end justify-content-center">
-    <div class="input-group mb-3">
-        <input id="searchedEmployee" type="text" class="form-control" placeholder="Search employee...">
-        <button class="btn btn-outline-primary" type="button" onclick="search()">Search</button>
-    </div>
-    <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="sort-btn" data-bs-toggle="dropdown" aria-expanded="false">
-            Sort by
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="sort-btn">
-            <li><a class="dropdown-item" href="/Employee/Index?sort=eaz">Employee name (A to Z)</a></li>
-            <li><a class="dropdown-item" href="/Employee/Index?sort=eza">Employee name (Z to A)</a></li>
-            <li><a class="dropdown-item" href="/Employee/Index?sort=hno">Hire date (newer to older)</a></li>
-            <li><a class="dropdown-item" href="/Employee/Index?sort=hon">Hire date (older to newer)</a></li>
-        </ul>
+
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex flex-column align-items-end justify-content-center">
+            <div class="input-group mb-3">
+                <input id="searchedEmployee" type="text" class="form-control" placeholder="Search employee...">
+                <button class="btn btn-outline-primary" type="button" onclick="search()">Search</button>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle mb-3" type="button" id="sort-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                    Sort by
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="sort-btn">
+                    <li><a class="dropdown-item" href="/Employee/Index?sort=eaz">Employee name (A to Z)</a></li>
+                    <li><a class="dropdown-item" href="/Employee/Index?sort=eza">Employee name (Z to A)</a></li>
+                    <li><a class="dropdown-item" href="/Employee/Index?sort=hno">Hire date (newer to older)</a></li>
+                    <li><a class="dropdown-item" href="/Employee/Index?sort=hon">Hire date (older to newer)</a></li>
+                </ul>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Full Name
+                        </th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Employment Status</th>
+                        <th>Position</th>
+                        <th>Hire Date</th>
+                        <th>Download Employee Details</th>
+                    </tr>
+                </thead>
+                <tbody id="employeeTableBody">
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.FullName</td>
+                            <td>@item.EMailAddress1</td>
+                            <td>@item.hiring_Department</td>
+                            <td>@item.hiring_EmploymentStatus</td>
+                            <td>@item.hiring_Position</td>
+                            <td>@item.hiring_HireDate</td>
+                            <td>
+                                <button class="btn btn-primary" onclick="viewEmployee('@item.Id')">Download</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Full Name
-            </th>
-            <th>Email</th>
-            <th>Department</th>
-            <th>Employment Status</th>
-            <th>Hire Date</th>
-            <th>Download Employee Details</th>
-        </tr>
-    </thead>
-    <tbody id="employeeTableBody">
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.FullName</td>
-                <td>@item.EMailAddress1</td>
-                <td>@item.hiring_Department</td>
-                <td>@item.hiring_EmploymentStatus</td>
-                <td>@item.hiring_HireDate</td>
-                <td>
-                    <button class="btn btn-primary" onclick="viewEmployee('@item.Id')">Download</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
 
 @section Scripts {
     <script>
@@ -91,16 +98,17 @@
                         response.contacts.forEach(function (contact) {
                             console.log(contact)
                             rows += `
-                                                                        <tr>
-                                                                            <td>${contact.fullName}</td>
-                                                                            <td>${contact.eMailAddress1 ?? ""}</td>
-                                                                            <td>${getDepartment(contact.hiring_Department)}</td>
-                                                                            <td>${getEmployementStatus(contact.hiring_EmploymentStatus)}</td>
-                                                                            <td>${formatISODate(contact.hiring_HireDate)}</td>
-                                                                            <td>
-                                                                                <button class="btn btn-primary" onclick="viewEmployee('${contact.contactId}')">Download</button>
-                                                                            </td>
-                                                                        </tr>`;
+                                <tr>
+                                    <td>${contact.fullName}</td>
+                                    <td>${contact.eMailAddress1 ?? ""}</td>
+                                    <td>${getDepartment(contact.hiring_Department)}</td>
+                                    <td>${getEmployementStatus(contact.hiring_EmploymentStatus)}</td>
+                                    <td>${getPosition(contact.hiring_Position)}</td>
+                                    <td>${formatISODate(contact.hiring_HireDate)}</td>
+                                    <td>
+                                        <button class="btn btn-primary" onclick="viewEmployee('${contact.contactId}')">Download</button>
+                                    </td>
+                                </tr>`;
                         });
 
 
@@ -146,6 +154,7 @@
                     return 'IT';
                 case 414090003:
                     return 'Marketing';
+
                 default:
                     return '';
             }
@@ -159,6 +168,27 @@
                     return 'Employee';
                 case 414090002:
                     return 'Ex-Employee';
+
+                default:
+                    return '';
+            }
+        }
+
+        const getPosition = (position) => {
+            switch (position) {
+                case 414090000:
+                    return 'Jr. Developer';
+                case 414090001:
+                    return 'Sr. Developer';
+                case 414090002:
+                    return 'Trainee';
+                case 414090003:
+                    return 'Team Lead';
+                case 414090004:
+                    return 'Project Manager';
+                case 414090005:
+                    return 'CEO';
+
                 default:
                     return '';
             }
