@@ -27,33 +27,36 @@
                 {
                     <tr>
                         <td>@category.SoftwareCategory.pcf_Name</td>
-                        <td id="current-@category.SoftwareCategory.pcf_Name">
+                        <td id="current-@category.SoftwareCategory.pcf_Name" data-category="1">
                             @foreach (var current in category.CurrentSoftwares)
                             {
                                 <img src="@Url.Action("GetIcon", "SoftwareInventory", new { softwareId = current.pcf_SoftwareId })"
                                      height="50" width="50" draggable="true" class="draggable"
                                      data-toggle="tooltip"
                                      data-placement="top"
+                                     data-software-id="@current.pcf_SoftwareId"
                                      title="@current.pcf_Name" />
                             }
                         </td>
-                        <td id="future-@category.SoftwareCategory.pcf_Name">
+                        <td id="future-@category.SoftwareCategory.pcf_Name" data-category="2">
                             @foreach (var future in category.FutureSoftwares)
                             {
                                 <img src="@Url.Action("GetIcon", "SoftwareInventory", new { softwareId = future.pcf_SoftwareId })"
                                      height="50" width="50" draggable="true" class="draggable"
                                      data-toggle="tooltip"
                                      data-placement="top"
+                                     data-software-id="@future.pcf_SoftwareId"
                                      title="@future.pcf_Name" />
                             }
                         </td>
-                        <td id="other-@category.SoftwareCategory.pcf_Name">
+                        <td id="other-@category.SoftwareCategory.pcf_Name" data-category="3">
                             @foreach (var other in category.OtherSoftwares)
                             {
                                 <img src="@Url.Action("GetIcon", "SoftwareInventory", new { softwareId = other.pcf_SoftwareId })"
                                      height="50" width="50" draggable="true" class="draggable"
                                      data-toggle="tooltip"
                                      data-placement="top"
+                                     data-software-id="@other.pcf_SoftwareId"
                                      title="@other.pcf_Name" />
                             }
                         </td>
@@ -88,9 +91,34 @@
 
             const dropIcon = (e, area, selectedIcon, sourceRow) => {
                 e.preventDefault();
+
+                const softwareId = selectedIcon.getAttribute('data-software-id');
+                const prevSoftwareType = selectedIcon.closest('td').getAttribute('data-category')
+                const targetSoftwareType = area.closest('td').getAttribute('data-category');
+
                 let targetRow = area.closest('tr');
+
                 if (sourceRow === targetRow) {
-                    area.appendChild(selectedIcon);
+                    $.ajax({
+                        url: '/SoftwareInventory/UpdateSoftwareType',
+                        type: 'POST',
+                        data: {
+                            softwareId,
+                            prevSoftwareType,
+                            targetSoftwareType
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                console.log('Update successful');
+                                area.appendChild(selectedIcon);
+                            } else {
+                                console.error('Update failed');
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('AJAX call failed:', status, error);
+                        }
+                    });
                 }
             }
 

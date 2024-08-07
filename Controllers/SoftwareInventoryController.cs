@@ -27,9 +27,9 @@ public class SoftwareInventoryController : Controller
             SoftwareInventoryViewModel vm = new()
             {
                 SoftwareCategory = item,
-                CurrentSoftwares = _softwareService.GetSoftwaresBySoftwareCategory(item.pcf_SoftwareCategoryId.ToString(), ((int)pcf_software_pcf_softwaretype.Current)),
-                FutureSoftwares = _softwareService.GetSoftwaresBySoftwareCategory(item.pcf_SoftwareCategoryId.ToString(), ((int)pcf_software_pcf_softwaretype.Future)),
-                OtherSoftwares = _softwareService.GetSoftwaresBySoftwareCategory(item.pcf_SoftwareCategoryId.ToString(), ((int)pcf_software_pcf_softwaretype.Others))
+                CurrentSoftwares = _softwareService.GetSoftwaresBySoftwareCategory(item.pcf_SoftwareCategoryId.ToString()!, ((int)pcf_software_pcf_softwaretype.Current)),
+                FutureSoftwares = _softwareService.GetSoftwaresBySoftwareCategory(item.pcf_SoftwareCategoryId.ToString()!, ((int)pcf_software_pcf_softwaretype.Future)),
+                OtherSoftwares = _softwareService.GetSoftwaresBySoftwareCategory(item.pcf_SoftwareCategoryId.ToString()!, ((int)pcf_software_pcf_softwaretype.Others))
             };
 
             lvm.Add(vm);
@@ -46,12 +46,10 @@ public class SoftwareInventoryController : Controller
         return File(iconBytes, "image/png");
     }
 
-    public IActionResult GetSoftwaresBySoftwareCategory(string scId)
+    [HttpPost]
+    public IActionResult UpdateSoftwareType(string softwareId, int prevSoftwareType, int targetSoftwareType)
     {
-        List<Software> softwares = _softwareService.GetSoftwaresBySoftwareCategory(scId, ((int)pcf_software_pcf_softwaretype.Current));
-        List<Software> softwares1 = _softwareService.GetSoftwaresBySoftwareCategory(scId, ((int)pcf_software_pcf_softwaretype.Future));
-        List<Software> softwares2 = _softwareService.GetSoftwaresBySoftwareCategory(scId, ((int)pcf_software_pcf_softwaretype.Others));
-        List<Software> softwares3 = _softwareService.GetSoftwaresBySoftwareCategory(scId);
-        return Json(new { softwares });
+        bool isUpdated = _softwareService.UpdateSoftwareType(softwareId, prevSoftwareType, targetSoftwareType);
+        return Json(new { success = isUpdated });
     }
 }

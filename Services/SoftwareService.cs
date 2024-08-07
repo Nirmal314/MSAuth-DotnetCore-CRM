@@ -79,6 +79,39 @@ public class SoftwareService : ISoftwareService
 
         return softwares;
     }
-}
 
-//https://localhost:7071/SoftwareInventory/GetSoftwaresBySoftwareCategory?scId=4a45ec6e-f053-ef11-bfe3-6045bd73754e
+    public bool UpdateSoftwareType(string softwareId, int prevSoftwareType, int targetSoftwareType)
+    {
+        try
+        {
+            Entity record = _service.Retrieve("pcf_software", new Guid(softwareId), new ColumnSet("pcf_softwaretype"));
+
+            if (record.Contains("pcf_softwaretype"))
+            {
+                OptionSetValueCollection prevSoftwareTypes = ((OptionSetValueCollection)record["pcf_softwaretype"]);
+
+                if (!prevSoftwareTypes.Any(t => t.Value.Equals(targetSoftwareType)) && prevSoftwareType != targetSoftwareType)
+                {
+                    prevSoftwareTypes.Remove(new OptionSetValue(prevSoftwareType));
+                    prevSoftwareTypes.Add(new OptionSetValue(targetSoftwareType));
+
+                    record["pcf_softwaretype"] = prevSoftwareTypes;
+                    _service.Update(record);
+
+                    return true;
+                }
+                return false;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("An error occurred: " + ex.Message);
+            return false;
+        }
+    }
+
+}
