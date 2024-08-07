@@ -70,6 +70,8 @@ builder.Services.AddScoped<IChartService, ChartService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ISoftwareService, SoftwareService>();
+builder.Services.AddScoped<ISoftwareCategoryService, SoftwareCategoryService>();
 builder.Services.AddTransient<IClaimsTransformation, CustomClaimsTransformer>();
 
 builder.Services.AddTransient<ServiceClient>(provider =>

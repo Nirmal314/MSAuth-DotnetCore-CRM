@@ -1,0 +1,109 @@
+﻿@model List<MSAuth.ViewModels.SoftwareInventoryViewModel>
+
+@{
+    ViewData["Title"] = "Software Inventory";
+}
+<div class="card">
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Category
+                    </th>
+                    <th>
+                        Current
+                    </th>
+                    <th>
+                        Future
+                    </th>
+                    <th>
+                        Others
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var category in Model)
+                {
+                    <tr>
+                        <td>@category.SoftwareCategory.pcf_Name</td>
+                        <td id="current-@category.SoftwareCategory.pcf_Name">
+                            @foreach (var current in category.CurrentSoftwares)
+                            {
+                                <img src="@Url.Action("GetIcon", "SoftwareInventory", new { softwareId = current.pcf_SoftwareId })"
+                                     height="50" width="50" draggable="true" class="draggable"
+                                     data-toggle="tooltip"
+                                     data-placement="top"
+                                     title="@current.pcf_Name" />
+                            }
+                        </td>
+                        <td id="future-@category.SoftwareCategory.pcf_Name">
+                            @foreach (var future in category.FutureSoftwares)
+                            {
+                                <img src="@Url.Action("GetIcon", "SoftwareInventory", new { softwareId = future.pcf_SoftwareId })"
+                                     height="50" width="50" draggable="true" class="draggable"
+                                     data-toggle="tooltip"
+                                     data-placement="top"
+                                     title="@future.pcf_Name" />
+                            }
+                        </td>
+                        <td id="other-@category.SoftwareCategory.pcf_Name">
+                            @foreach (var other in category.OtherSoftwares)
+                            {
+                                <img src="@Url.Action("GetIcon", "SoftwareInventory", new { softwareId = other.pcf_SoftwareId })"
+                                     height="50" width="50" draggable="true" class="draggable"
+                                     data-toggle="tooltip"
+                                     data-placement="top"
+                                     title="@other.pcf_Name" />
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+
+            const currentDDareas = document.querySelectorAll('[id^="current-"]');
+            const futureDDareas = document.querySelectorAll('[id^="future-"]');
+            const otherDDareas = document.querySelectorAll('[id^="other-"]');
+
+            const allDDareas = [...currentDDareas, ...futureDDareas, ...otherDDareas]
+
+            const icons = document.getElementsByClassName("draggable");
+
+            let selectedIcon;
+            let sourceRow;
+
+            allDDareas.forEach(area => {
+                area.addEventListener("dragover", (e) => {
+                    e.preventDefault();
+                });
+            });
+
+            const dropIcon = (e, area, selectedIcon, sourceRow) => {
+                e.preventDefault();
+                let targetRow = area.closest('tr');
+                if (sourceRow === targetRow) {
+                    area.appendChild(selectedIcon);
+                }
+            }
+
+            allDDareas.forEach(area => {
+                area.addEventListener("drop", (e) => dropIcon(e, area, selectedIcon, sourceRow));
+            });
+
+            for (let icon of icons) {
+                icon.addEventListener("dragstart", (e) => {
+                    selectedIcon = e.target;
+                    sourceRow = selectedIcon.closest('tr');
+                });
+            }
+        });
+    </script>
+}

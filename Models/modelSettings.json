@@ -7,7 +7,8 @@
   "emitVirtualAttributes": false,
   "entitynamesfilter-comment": "Filters the list of entities are retrieved when reading data from Dataverse.",
   "entityNamesFilter": [
-    "hiring_crmlogs"
+    "pcf_software",
+    "pcf_softwarecategory"
   ],
   "entitytypesfolder-comment": "Folder name that contains entities.",
   "entityTypesFolder": "Entities",
