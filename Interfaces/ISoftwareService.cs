@@ -9,4 +9,6 @@ public interface ISoftwareService
     public byte[] GetIconBytes(string softwareId);
     public List<Software> GetSoftwaresBySoftwareCategory(string scId, int? softwareType = null);
     public bool UpdateSoftwareType(string softwareId, int prevSoftwareType, int targetSoftwareType);
+    public bool CreateSoftware(string category, string softwareName, int softwareType, IFormFile iconFile);
+    public bool AddSoftware(string category, string software, int softwareType);
 }

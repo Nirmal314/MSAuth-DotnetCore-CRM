@@ -5,6 +5,92 @@
 }
 <div class="card">
     <div class="card-body">
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary mb-3" id="add-software-btn">
+            Add Software
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="addSoftwareModal" tabindex="-1" role="dialog" aria-labelledby="addSoftwareModalTitle"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addSoftwareModalTitle">Manage softwares</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="nav nav-pills" id="myTab3" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="home-tab3" data-toggle="tab" href="#addMySoftware" role="tab"
+                                   aria-selected="true">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="profile-tab3" data-toggle="tab" href="#addNewSoftware" role="tab"
+                                   aria-selected="false">Profile</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="myTabContent2">
+                            <div class="tab-pane fade show active" id="addMySoftware" role="tabpanel">
+                                <div class="form-group">
+                                    <label>Software Category</label>
+                                    <select class="form-control" id="software-category-existing">
+                                        @foreach (var category in Model)
+                                        {
+                                            <option value="@category.SoftwareCategory.pcf_SoftwareCategoryId">@category.SoftwareCategory.pcf_Name</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Software</label>
+                                    <select class="form-control" id="software-existing">
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Software Type</label>
+                                    <select class="form-control" id="software-type-existing">
+                                        <option value="1">Current</option>
+                                        <option value="2">Future</option>
+                                        <option value="3">Others</option>
+                                    </select>
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="handleSubmitExistingSoftware()">Save changes</button>
+                            </div>
+                            <div class="tab-pane fade" id="addNewSoftware" role="tabpanel">
+                                <div class="form-group">
+                                    <label>Software Category</label>
+                                    <select class="form-control" id="software-category">
+                                        @foreach (var category in Model)
+                                        {
+                                            <option value="@category.SoftwareCategory.pcf_SoftwareCategoryId">@category.SoftwareCategory.pcf_Name</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Software Name</label>
+                                    <input type="text" class="form-control" placeholder="Enter software name" id="software-name">
+                                </div>
+                                <div class="form-group">
+                                    <label>Icon</label>
+                                    <input name="iconFile" type="file" id="software-icon" class="form-control" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Software Type</label>
+                                    <select class="form-control" id="software-type">
+                                        <option value="1">Current</option>
+                                        <option value="2">Future</option>
+                                        <option value="3">Others</option>
+                                    </select>
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="handleSubmitNewSoftware()">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <table class="table">
             <thead>
                 <tr>
@@ -89,38 +175,6 @@
                 });
             });
 
-            const dropIcon = (e, area, selectedIcon, sourceRow) => {
-                e.preventDefault();
-
-                const softwareId = selectedIcon.getAttribute('data-software-id');
-                const prevSoftwareType = selectedIcon.closest('td').getAttribute('data-category')
-                const targetSoftwareType = area.closest('td').getAttribute('data-category');
-
-                let targetRow = area.closest('tr');
-
-                if (sourceRow === targetRow) {
-                    $.ajax({
-                        url: '/SoftwareInventory/UpdateSoftwareType',
-                        type: 'POST',
-                        data: {
-                            softwareId,
-                            prevSoftwareType,
-                            targetSoftwareType
-                        },
-                        success: function (response) {
-                            if (response.success) {
-                                console.log('Update successful');
-                                area.appendChild(selectedIcon);
-                            } else {
-                                console.error('Update failed');
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            console.error('AJAX call failed:', status, error);
-                        }
-                    });
-                }
-            }
 
             allDDareas.forEach(area => {
                 area.addEventListener("drop", (e) => dropIcon(e, area, selectedIcon, sourceRow));
@@ -133,5 +187,179 @@
                 });
             }
         });
+
+        var activeTabId = null;
+
+        $('#add-software-btn').on('click', function () {
+            $('#addSoftwareModal').appendTo("body").modal('show');
+        })
+
+        $('#software-category-existing').on('change', function () {
+            var softwareCategoryId = $(this).val();
+
+            $.ajax({
+                url: '/SoftwareInventory/GetSoftwaresBySoftwareCategory',
+                type: 'POST',
+                data: {
+                    softwareCategoryId
+                },
+                success: function (response) {
+                    var selectSoftwares = $('#software-existing');
+                    selectSoftwares.empty();
+
+                    if (response.success && Array.isArray(response.softwares)) {
+                        $.each(response.softwares, function (index, software) {
+                            var softwareId = '';
+                            var softwareName = '';
+
+                            $.each(software.attributes, function (index, attribute) {
+                                if (attribute.key === 'pcf_softwareid') {
+                                    softwareId = attribute.value;
+                                } else if (attribute.key === 'pcf_name') {
+                                    softwareName = attribute.value;
+                                }
+                            });
+
+                            if (softwareId && softwareName) {
+                                selectSoftwares.append(
+                                    $('<option></option>').val(softwareId).text(softwareName)
+                                );
+                            }
+                        });
+                    } else {
+                        console.error('Unexpected response format or unsuccessful request');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('An error occurred while saving the software details.');
+                }
+            })
+
+        });
+
+        const dropIcon = (e, area, selectedIcon, sourceRow) => {
+            e.preventDefault();
+
+            const softwareId = selectedIcon.getAttribute('data-software-id');
+            const prevSoftwareType = selectedIcon.closest('td').getAttribute('data-category')
+            const targetSoftwareType = area.closest('td').getAttribute('data-category');
+
+            let targetRow = area.closest('tr');
+
+            if (sourceRow === targetRow) {
+                $.ajax({
+                    url: '/SoftwareInventory/UpdateSoftwareType',
+                    type: 'POST',
+                    data: {
+                        softwareId,
+                        prevSoftwareType,
+                        targetSoftwareType
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            console.log('Update successful');
+                            area.appendChild(selectedIcon);
+                        } else {
+                            console.error('Update failed');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX call failed:', status, error);
+                    }
+                });
+            }
+        }
+
+        const updateSoftwareList = (softwares, softwareType, category) => {
+            var targetElement;
+            if (softwareType == 1) {
+                targetElement = $('#current-' + category);
+            } else if (softwareType == 2) {
+                targetElement = $('#future-' + category);
+            } else if (softwareType == 3) {
+                targetElement = $('#other-' + category);
+            }
+
+            targetElement.empty();
+            $.each(softwares, function (index, software) {
+                var img = $('<img/>', {
+                    src: '@Url.Action("GetIcon", "SoftwareInventory", new { softwareId = "__softwareId__" })'.replace('__softwareId__', software.pcf_SoftwareId),
+                    height: 50,
+                    width: 50,
+                    draggable: true,
+                    class: 'draggable',
+                    'data-toggle': 'tooltip',
+                    'data-placement': 'top',
+                    'data-software-id': software.pcf_SoftwareId,
+                    title: software.pcf_Name
+                });
+                targetElement.append(img);
+            });
+        }
+
+        const handleSubmitNewSoftware = () => {
+            var category = $('#software-category').val();
+            var softwareName = $('#software-name').val();
+            var softwareType = $('#software-type').val();
+
+            var fileInput = document.getElementById('software-icon');
+            var file = fileInput.files[0];
+
+            if (!file) {
+                console.error('No file selected.');
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append('category', category);
+            formData.append('softwareName', softwareName);
+            formData.append('softwareType', softwareType);
+            formData.append('iconFile', file);
+
+            $.ajax({
+                url: '/SoftwareInventory/CreateSoftware',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    $('#addSoftwareModal').modal('hide');
+                    window.location.reload(true);
+                },
+                error: function (xhr, status, error) {
+                    alert('An error occurred while saving the software details.');
+                }
+            });
+        }
+
+        const handleSubmitExistingSoftware = () => {
+            var category = $('#software-category-existing').val();
+            var software = $('#software-existing').val();
+            var softwareType = $('#software-type-existing').val();
+
+            // var formData = new FormData();
+            // formData.append('category', category);
+            // formData.append('software', software);
+            // formData.append('softwareType', softwareType);
+
+            $.ajax({
+                url: '/SoftwareInventory/AddSoftware',
+                type: 'POST',
+                data: {
+                    category,
+                    software,
+                    softwareType
+                },
+                success: function (response) {
+                    $('#addSoftwareModal').modal('hide');
+                    // window.location.reload(true);
+                    updateSoftwareList(response.softwares, softwareType, category);
+                },
+                error: function (xhr, status, error) {
+                    alert('An error occurred while saving the software details.');
+                }
+            });
+        }
+
     </script>
 }

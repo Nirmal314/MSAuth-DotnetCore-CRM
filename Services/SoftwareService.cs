@@ -1,4 +1,5 @@
-﻿using Microsoft.PowerPlatform.Dataverse.Client;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Rest;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
@@ -112,6 +113,85 @@ public class SoftwareService : ISoftwareService
             Console.WriteLine("An error occurred: " + ex.Message);
             return false;
         }
+    }
+
+    public bool CreateSoftware(string category, string softwareName, int softwareType, IFormFile iconFile)
+    {
+        try
+        {
+            byte[] mem = [];
+
+            using (var memoryStream = new MemoryStream())
+            {
+                iconFile.CopyTo(memoryStream);
+                mem = memoryStream.ToArray();
+            }
+
+            if (mem.Length > 0)
+            {
+                Entity record = new("pcf_software");
+                record["pcf_icon"] = mem;
+                record["pcf_name"] = softwareName;
+                record["pcf_softwaretype"] = new OptionSetValueCollection { new OptionSetValue(softwareType) };
+                record["pcf_softwarecategory"] = new EntityReference("pcf_softwarecategory", new Guid(category));
+                _service.Create(record);
+                return true;
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("An error occurred: " + ex.Message);
+            return false;
+        }
+    }
+
+    public bool AddSoftware(string category, string software, int softwareType)
+    {
+        Entity existingSoftware = _service.Retrieve("pcf_software", new Guid(software), new ColumnSet(true));
+
+        OptionSetValueCollection? prevSoftwareTypes;
+
+        try
+        {
+            prevSoftwareTypes = ((OptionSetValueCollection)existingSoftware["pcf_softwaretype"]);
+
+        }
+        catch (KeyNotFoundException)
+        {
+            prevSoftwareTypes = null;
+        }
+
+        if (prevSoftwareTypes != null && prevSoftwareTypes.Count >= 2)
+        {
+            return false;
+        }
+
+        if (prevSoftwareTypes != null)
+        {
+            if (prevSoftwareTypes.FirstOrDefault().Value != softwareType)
+            //if (prevSoftwareTypes.Any(s => s.Equals(softwareType)))
+            {
+                prevSoftwareTypes.Add(new OptionSetValue(softwareType));
+
+                existingSoftware["pcf_softwaretype"] = prevSoftwareTypes;
+                _service.Update(existingSoftware);
+
+                return true;
+
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            existingSoftware["pcf_softwaretype"] = new OptionSetValueCollection { new OptionSetValue(softwareType) };
+            _service.Update(existingSoftware);
+        }
+
+        return false;
     }
 
 }

@@ -52,4 +52,30 @@ public class SoftwareInventoryController : Controller
         bool isUpdated = _softwareService.UpdateSoftwareType(softwareId, prevSoftwareType, targetSoftwareType);
         return Json(new { success = isUpdated });
     }
+    [HttpPost]
+    public IActionResult CreateSoftware(string category, string softwareName, int softwareType, IFormFile iconFile)
+    {
+        bool isCreated = _softwareService.CreateSoftware(category, softwareName, softwareType, iconFile);
+        return Json(new { success = isCreated });
+    }
+
+    [HttpPost]
+    public IActionResult AddSoftware(string category, string software, int softwareType)
+    {
+        bool isAdded = _softwareService.AddSoftware(category, software, softwareType);
+
+        if (isAdded)
+        {
+            var updatedSoftwares = _softwareService.GetSoftwaresBySoftwareCategory(category, softwareType);
+            return Json(new { success = true, softwares = updatedSoftwares });
+        }
+
+        return Json(new { success = false });
+    }
+
+    public IActionResult GetSoftwaresBySoftwareCategory(string softwareCategoryId)
+    {
+        List<Software> softwares = _softwareService.GetSoftwaresBySoftwareCategory(softwareCategoryId);
+        return Json(new { softwares, success = true });
+    }
 }

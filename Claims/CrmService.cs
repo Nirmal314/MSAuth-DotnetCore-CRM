@@ -28,22 +28,22 @@ namespace MSAuth.Claims
             {
                 ColumnSet = new ColumnSet("name"),
                 LinkEntities =
-            {
-                new LinkEntity
                 {
-                    LinkFromEntityName = "role",
-                    LinkFromAttributeName = "roleid",
-                    LinkToEntityName = "systemuserroles",
-                    LinkToAttributeName = "roleid",
-                    LinkCriteria =
+                    new LinkEntity
                     {
-                        Conditions =
+                        LinkFromEntityName = "role",
+                        LinkFromAttributeName = "roleid",
+                        LinkToEntityName = "systemuserroles",
+                        LinkToAttributeName = "roleid",
+                        LinkCriteria =
                         {
-                            new ConditionExpression("systemuserid", ConditionOperator.Equal, systemUserId)
+                            Conditions =
+                            {
+                                new ConditionExpression("systemuserid", ConditionOperator.Equal, systemUserId)
+                            }
                         }
                     }
                 }
-            }
             };
 
             var roleEntities = _serviceClient.RetrieveMultiple(roleQuery).Entities;
