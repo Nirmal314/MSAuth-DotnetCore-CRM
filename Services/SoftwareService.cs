@@ -170,7 +170,6 @@ public class SoftwareService : ISoftwareService
         if (prevSoftwareTypes != null)
         {
             if (prevSoftwareTypes.FirstOrDefault().Value != softwareType)
-            //if (prevSoftwareTypes.Any(s => s.Equals(softwareType)))
             {
                 prevSoftwareTypes.Add(new OptionSetValue(softwareType));
 

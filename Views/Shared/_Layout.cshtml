@@ -32,6 +32,8 @@
         string[] roles = Context.Session.GetString("Roles")!.Split(",");
     }
 
+    <div id="root"></div>
+
     <div id="app">
         <div class="main-wrapper main-wrapper-1">
             <div class="navbar-bg"></div>
@@ -105,7 +107,6 @@
                     </div>
                     <div class="section-body">
                         @RenderBody()
-                        <button onclick="makeToast()">Toast</button>
                     </div>
                 </section>
             </div>
@@ -138,11 +139,10 @@
     <script src="~/theme/js/scripts.js"></script>
     <script src="~/theme/js/custom.js"></script>
 
-    <script src="~/dist/index.js"></script>
-
-    <script>
-        const makeToast = () => toast('Event has been created')
-    </script>
+    <!-- React -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="~/dist/bundle.js"></script>
 </body>
 
 </html>
